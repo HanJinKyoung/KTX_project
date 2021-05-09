@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="voc.model.VocBean">
+	<insert id="WriteVoc">
+		insert into
+		p_QnA(q_num,q_writer,q_receiver,q_subject,q_reg_date,q_ref,q_re_step,q_re_level,q_content,q_ip)
+		values(Q_seq.nextval,#{q_writer},#{q_receiver},#{q_subject},sysdate,Q_seq.currval,0,0,#{q_content},#{q_ip})
+	</insert>
+	<select id="GetTotalCount" resultType="int">
+   		select count(*) from (select * from p_QnA where q_writer = #{m_id} or q_receiver = #{m_id}) 
+   		<if test='whatColumn=="q_writer"'>
+			where q_writer like #{keyword}
+		</if>
+		<if test='whatColumn=="q_subject"'>
+			where q_subject like #{keyword}
+		</if>
+		<if test="whatColumn=='q_state'">
+			where q_state like #{keyword}
+		</if>
+	</select>
+	<select id="GetDataList" resultType="MyVoc">
+		select q_num, q_writer,q_receiver, q_subject, q_reg_date, q_ref, q_re_step, q_re_level,q_content,q_ip,q_state
+		from (select rownum as rank, q_num, q_writer,q_receiver, q_subject, q_reg_date, q_ref, q_re_step, q_re_level, q_content,q_ip,q_state
+		from (select q_num, q_writer,q_receiver, q_subject, q_reg_date, q_ref, q_re_step, q_re_level, q_content,q_ip,q_state
+		from p_QnA where q_writer = #{m_id} or q_receiver = #{m_id} order by q_ref desc, q_re_step asc))
+   		<if test='whatColumn=="q_writer"'>
+			where q_writer like #{keyword}
+		</if>
+		<if test='whatColumn=="q_subject"'>
+			where q_subject like #{keyword}
+		</if>
+		<if test="whatColumn=='q_state'">
+			where q_state like #{keyword}
+		</if>	
+	</select>
+	<select id="GetContent" resultType="MyVoc">
+		select * from p_QnA
+		where q_num=#{q_num}
+	</select>
+	<delete id="DeleteVoc">
+		delete from p_QnA
+		where q_num = #{q_num}
+	</delete>
+	<delete id="DeleteVocRef">
+		delete from p_QnA
+		where q_ref = #{q_ref}
+	</delete>
+	<update id="StateUpdate">
+		update p_QnA set q_state = '답변완료'
+		where q_num = #{q_ref}
+	</update>
+	<update id="UpdateRestep">
+		update p_QnA set q_re_step = q_re_step+1 
+		where q_ref = #{q_ref} and q_re_step > #{q_re_step}
+	</update>
+	<insert id="InsertReply">
+		insert into p_QnA(q_num,q_writer,q_receiver,q_subject,q_reg_date,q_ref,q_re_step,q_re_level,q_content,q_ip,q_state)
+		values(Q_seq.nextval,#{q_writer},#{q_receiver},#{q_subject},sysdate,#{q_ref},#{q_re_step},#{q_re_level},#{q_content},#{q_ip},'re')
+	</insert>
+	<update id="UpdateVoc">
+		update p_QnA set q_subject=#{q_subject}, q_content=#{q_content}, q_reg_date = sysdate
+		where q_num = #{q_num}
+	</update>
+</mapper>

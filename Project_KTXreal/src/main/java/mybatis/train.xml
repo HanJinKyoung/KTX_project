@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="train.model.TrainBean">
+	<select id="GetTnum" resultType="int">
+		select count(*) from p_train where t_num = #{t_num}
+	</select>
+	<select id="GetRnum" resultType="int">
+		select count(*) from p_race where t_num = #{t_num}
+	</select>
+	<insert id="InsertTrain">
+		insert into p_train(t_num,t_type,t_way,t_count) 
+		values(#{t_num},#{t_type},#{t_way},#{t_count})
+	</insert>
+	<insert id="InsertRace">
+		insert into p_race(t_num,r_num,r_start,r_end,r_starth,r_startm,r_endh,r_endm,r_price) 
+		values(#{t_num},r_seq.nextval,#{r_start},#{r_end},#{r_starth},#{r_startm},#{r_endh},#{r_endm},#{r_price})
+	</insert>
+	<select id="GetTotalCount" resultType="int">
+		select count(*) from p_race
+		<if test="whatColumn == 't_num'">
+			where t_num = #{keyword}
+		</if>
+		<if test="whatColumn == 'r_start'">
+			where r_start = #{keyword}
+		</if>
+		<if test="whatColumn == 'r_end'">
+			where r_end = #{keyword}
+		</if>
+	</select>
+	<select id="GetAlldata" resultType="MyRace">
+		select * from p_race
+		<if test="whatColumn == 't_num'">
+			where t_num like #{keyword}
+		</if>
+		<if test="whatColumn == 'r_start'">
+			where r_start like #{keyword}
+		</if>
+		<if test="whatColumn == 'r_end'">
+			where r_end like #{keyword}
+		</if>
+		order by t_num asc, r_starth asc, r_startm asc, r_endh asc, r_endm asc
+	</select>
+	<select id="GetTrainlist" resultType="MyRace">
+		select * from p_race 
+		where r_start = #{r_start} and r_end = #{r_end} and r_starth >= #{r_starth}
+		order by r_starth,r_startm
+	</select>
+	<select id="GetByRnum" resultType="MyRace">
+		select * from p_race where r_num = #{r_num}
+	</select>
+	<select id="AllTrainCount" resultType="int">
+		select count(*) from p_train
+		<if test="whatColumn == 't_num'">
+			where t_num like #{keyword}
+		</if>
+	</select>
+	<select id="AllTrain" resultType="MyTrain">
+		select * from p_train
+		<if test="whatColumn == 't_num'">
+			where t_num like #{keyword}
+		</if>
+		order by t_num asc
+	</select>
+	<delete id="DelTrain">
+		delete from p_train where t_num=#{t_num}
+	</delete>
+	<select id="GetRInfo" resultType="int">
+		select count(*) from p_race
+		where t_num=#{t_num} and r_start=#{r_start} and r_end=#{r_end}
+	</select>
+</mapper>

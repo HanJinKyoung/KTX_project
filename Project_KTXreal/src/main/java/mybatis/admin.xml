@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.model.CheckBean">
+	<insert id="InCheck">
+		insert into p_check(c_num,c_name,c_date,c_intime,c_count,m_num)
+      values(p_check_seq.nextval,#{c_name},sysdate,sysdate,#{c_count},#{m_num})
+	</insert>
+	<update id="OutCheck">
+		update p_check set c_outtime = sysdate, c_count=#{c_count}+1
+		where c_num = #{c_num}
+	</update>
+	<select id="FindIn" resultType="MyCheck">
+		select * from p_check
+		where c_date = (
+		select max(c_intime)
+		from p_check
+		where c_name=#{c_name})
+	</select>
+	<select id="NumCheckList" resultType="MyCheck">
+		select * from p_check
+		where m_num = #{m_num}
+		order by c_num desc
+	</select>
+	<select id="GetTotalCount" resultType="int">
+		select count(*) from p_check where (m_num=to_number(#{m_num}))
+		<if test="whatColumn == 'c_date'">
+			and c_date between #{keyword1} and #{keyword2}
+		</if>
+	</select>
+	<select id="GetCheckList" resultType="MyCheck">
+		select * from p_check where (m_num=to_number(#{m_num}))
+		<if test="whatColumn == 'c_date'">
+			and c_date between #{keyword1} and #{keyword2}
+		</if>
+		order by c_num desc
+	</select>
+	<select id="PrePost" resultType="int">
+		select count(*) from p_check 
+		where m_num=#{num} and c_count>=1
+	</select>
+	<select id="DayCount" resultType="int">
+		select count(*) from p_check 
+		where (m_num=to_number(#{m_num})) and c_count>=1
+		<if test="whatColumn == 'c_date'">
+			and c_date between #{keyword1} and #{keyword2}
+		</if>
+	</select>
+	<select id="ReCheck" resultType="int">
+		select count(*) from p_check
+		where (to_char(c_date,'YYYYMMDD'))=(to_char(sysdate,'YYYYMMDD'))
+		and m_num=#{num} and c_count=0
+	</select>
+</mapper>

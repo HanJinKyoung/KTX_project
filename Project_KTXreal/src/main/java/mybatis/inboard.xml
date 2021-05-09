@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="inboard.InBoardBean">
+ 	<insert id="WriteIBoard">
+		insert into p_inboard(i_num,i_writer,i_subject,i_passwd,i_reg_date,i_content,i_filename)
+		values(in_seq.nextval,#{i_writer},#{i_subject},#{i_passwd},sysdate,#{i_content},#{i_filename})
+	</insert>
+	<select id="SelectI_num" resultType="MyInBoard">
+		select i_passwd from p_inboard where
+		i_num = #{i_num}
+	</select>
+	<delete id="DeleteArticle">
+		delete from p_inboard where i_num = #{i_num} and i_passwd = #{i_passwd}
+	</delete>
+	<select id="GetArticleCount" resultType="int">
+		select count(*) as cnt
+		from p_inboard
+	</select>
+	<select id="GetTotalCount" resultType="int">
+		select count(*) from p_inboard
+		<if test="whatColumn=='i_subject'">
+			where i_subject like #{keyword}
+		</if>
+	</select>
+	<select id="GetDataList" resultType="MyInBoard">
+		select i_num, i_writer, i_subject, i_passwd, i_reg_date, i_readcount,i_content,i_filename
+		from (select rownum as rank, i_num, i_writer, i_subject, i_passwd,
+		i_reg_date, i_readcount,i_content,i_filename
+		from (select i_num, i_writer, i_subject, i_passwd, i_reg_date, i_readcount,i_content,i_filename
+		from p_inboard order by i_num desc) )
+		<if test="whatColumn=='i_writer'">
+			where i_writer like #{keyword}
+		</if>
+		<if test="whatColumn=='i_subject'">
+			where i_subject like #{keyword}
+		</if>
+	</select>
+	<select id="GetData" resultType="MyInBoard">
+		select * from p_inboard
+		where i_num=#{i_num}
+	</select>
+	<update id="UpreadCount">
+		update p_inboard set i_readcount=i_readcount+1
+		where i_num = #{i_num}
+	</update>
+	<update id="UpdateIBoard">
+		update p_inboard set i_writer=#{i_writer}, i_subject=#{i_subject}, i_content=#{i_content}, i_filename=#{i_filename}
+		where i_num = #{i_num} and i_passwd = #{i_passwd}
+	</update>
+ 	<update id="noUpFile">
+ 		update p_inboard set i_writer=#{i_writer}, i_subject=#{i_subject}, i_content=#{i_content}
+		where i_num = #{i_num} and i_passwd = #{i_passwd}
+ 	</update>
+ 	<update id="UpExist">
+ 		update p_inboard set i_filename=#{i_filename}
+ 		where i_num = #{i_num} and i_passwd = #{i_passwd}
+ 	</update>
+ </mapper>

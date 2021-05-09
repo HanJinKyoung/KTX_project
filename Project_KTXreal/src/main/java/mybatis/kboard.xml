@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kboard.KBoardBean">
+	<insert id="WriteKBoard">
+		insert into
+		p_kboard(k_num,k_writer,k_subject,k_passwd,k_reg_date,k_content)
+		values(k_seq.nextval,#{k_writer},#{k_subject},#{k_passwd},sysdate,#{k_content})
+	</insert>
+	<select id="SelectK_num" resultType="MyKBoard">
+		select k_passwd from p_kboard where
+		k_num = #{k_num}
+	</select>
+	<delete id="DeleteArticle">
+		delete from p_kboard where k_num = #{k_num} and k_passwd = #{k_passwd}
+	</delete>
+	<select id="GetArticleCount" resultType="int">
+		select count(*) as cnt
+		from p_kboard
+	</select>
+	<select id="GetTotalCount" resultType="int">
+		select count(*) from p_kboard
+		<if test="whatColumn=='k_subject'">
+			where k_subject like #{keyword}
+		</if>
+	</select>
+	<select id="GetDataList" resultType="MyKBoard">
+		select k_num, k_writer, k_subject, k_passwd, k_reg_date, k_readcount,k_content
+		from (select rownum as rank, k_num, k_writer, k_subject, k_passwd,
+		k_reg_date, k_readcount,k_content
+		from (select k_num, k_writer, k_subject, k_passwd, k_reg_date, k_readcount,k_content
+		from p_kboard order by k_num desc) )
+		<if test="whatColumn=='k_writer'">
+			where k_writer like #{keyword}
+		</if>
+		<if test="whatColumn=='k_subject'">
+			where k_subject like #{keyword}
+		</if>
+	</select>
+	<select id="GetData" resultType="MyKBoard">
+		select * from p_kboard
+		where k_num=#{k_num}
+	</select>
+	<update id="UpreadCount">
+		update p_kboard set k_readcount=k_readcount+1
+		where k_num = #{k_num}
+	</update>
+	<update id="UpdateKBoard">
+		update p_kboard set k_writer=#{k_writer}, k_subject=#{k_subject}, k_content=#{k_content}
+		where k_num = #{k_num} and k_passwd = #{k_passwd}
+	</update>
+	<select id="Getmainklist" resultType="MyKBoard">
+		select k_num, k_subject, k_reg_date 
+		from (select rownum as rank, k_num, k_writer, k_subject, k_passwd,
+		k_reg_date, k_readcount,k_content
+		from (select k_num, k_writer, k_subject, k_passwd, k_reg_date, k_readcount,k_content
+		from p_kboard order by k_num desc))
+		where rank between 1 and 5
+	</select>
+</mapper>

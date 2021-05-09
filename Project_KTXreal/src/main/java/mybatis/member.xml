@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member.model.MemberBean">
+	<select id="GetMember" resultType="MyMember">
+		select * from p_member
+		where m_id = #{m_id}
+	</select>
+	<select id="GetGrade" resultType="MyMember">
+		select * from p_member
+		where m_grade = #{m_grade,jdbcType=VARCHAR}
+	</select>
+	<select id="FindId" resultType="MyMember">
+		select * from p_member
+		where m_name=#{m_name} and m_email=#{m_email}
+	</select>
+	<select id="FindPw" resultType="MyMember">
+		select * from p_member
+		where m_name=#{m_name} and m_id=#{m_id} and m_email=#{m_email}
+	</select>
+	<select id="GetData" resultType="MyMember">
+		select * from p_member
+		where m_id = #{m_id}
+	</select>
+	<insert id="InsertMember">
+      insert into p_member(m_num,m_grade,m_id,m_pw,m_name,m_age,m_phone_1,m_phone_2,m_phone_3,m_email,m_addr,m_date)
+      values(p_m_seq.nextval,#{m_grade},#{m_id},#{m_pw},#{m_name},#{m_age},#{m_phone_1},#{m_phone_2},#{m_phone_3},#{m_email},#{m_addr},sysdate)
+   </insert>
+   	<update id="UpdateMember">
+		update p_member set 
+		m_pw=#{m_pw}, m_email=#{m_email}, m_addr=#{m_addr}, m_phone_1=#{m_phone_1}, m_phone_2=#{m_phone_2}, m_phone_3=#{m_phone_3} 
+		where m_num=#{m_num}
+	</update>
+	
+   <select id="GetTotalCount" resultType="int">
+		select count(*) from p_member
+		<if test='grade == "M"'>
+			where m_grade like #{grade}
+		</if>
+		<if test='grade == "S"'>
+			where m_grade like #{grade}
+		</if>
+		<if test='grade == "all"'>
+			where (m_grade like 'S' or m_grade like 'M' or m_grade like 'A')
+		</if>
+			<choose>
+				<when test='whatColumn == "m_phone_3"'>
+					and m_phone_3 like #{keyword}
+				</when>
+				<when test='whatColumn =="m_name"'>
+					and m_name like #{keyword}
+				</when>
+				<otherwise>
+					order by m_num			
+				</otherwise>
+			</choose>
+	</select>
+
+	<select id="GetMemberList" resultType="MyMember">
+		select * from p_member
+		<if test='grade == "M"'>
+			where m_grade like #{grade}
+		</if>
+		<if test='grade == "S"'>
+			where m_grade like #{grade}
+		</if>
+		<if test='grade == "all"'>
+			where (m_grade like 'S' or m_grade like 'M' or m_grade like 'A')
+		</if>
+			<choose>
+				<when test='whatColumn == "m_phone_3"'>
+					and m_phone_3 like #{keyword}
+				</when>
+				<when test='whatColumn =="m_name"'>
+					and m_name like #{keyword}
+				</when>
+				<otherwise>
+					order by m_num			
+				</otherwise>
+			</choose>
+	</select>
+	<delete id="DeleteMember">
+		delete from p_member
+		where m_num=#{m_num}
+	</delete>
+	<select resultType="int" id="ChkId">
+		select count(*) from p_member where m_id=#{m_id} 
+	</select>
+	<select id="GetbyNum" resultType="MyMember">
+      select * from p_member
+      where m_num=#{m_num}
+   </select>
+   <update id="UpdateMeminfo">
+		update p_member set m_name=#{m_name}
+		where m_num=#{m_num}
+	</update>
+	<select id="GetEmail" resultType="int">
+		select count(*) from p_member
+		where m_email = #{m_email}	
+	</select>
+</mapper>

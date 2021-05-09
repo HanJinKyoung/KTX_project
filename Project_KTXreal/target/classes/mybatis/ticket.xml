@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ticket.model.TicketBean">
+	<select id="GetSitcount" resultType="int">
+		select count(*) from p_sit
+		where r_num=#{r_num} and s_code=#{s_code}
+	</select>
+	<insert id="InsertSit">
+		insert into p_sit(s_no,r_num,s_code) 
+		values(p_sit_seq.nextval,#{r_num},#{s_code})
+	</insert>
+	<select id="GetSno" resultType="int">
+		select s_no from p_sit
+		where r_num=#{r_num} and s_code=#{s_code}
+	</select>
+	<insert id="InsertTk">
+		insert into p_ticket(tk_num,tk_date,tk_partner,m_id,t_num,r_num,s_no,r_start,r_end,tk_reserve,tk_bookday)
+		values(#{tk_num},#{tk_date},#{tk_partner},#{m_id},#{t_num},#{r_num},#{s_no},#{r_start},#{r_end},'미결제',sysdate)
+	</insert>
+	<select id="TkChk" resultType="int">
+		select count(*) from p_ticket 
+		where tk_date=#{tk_date} 
+		and s_no=#{s_no} and t_num=#{t_num} and r_num=#{r_num}
+	</select>
+	<select id="GetTkcnt" resultType="int">
+		select count(*) from p_ticket where t_num = #{t_num} and r_num = #{r_num}
+	</select>
+	<select id="Stime" resultType="int">
+		select r_starth*60+r_startm from p_race
+		where r_start = #{r_start} and r_num = #{r_num}
+	</select>
+	<select id="Etime" resultType="int">
+		select r_endh*60+r_endm from p_race
+		where r_end = #{r_end} and r_num = #{r_num}
+	</select>
+	<select id="RnumArr" resultType="MyRace">
+		<![CDATA[
+		select r_num from p_race
+		where not (r_starth*60+r_startm<=#{stime} and r_endh*60+r_endm<=#{stime}
+		or r_starth*60+r_startm>=#{etime} and r_endh*60+r_endm>=#{etime}) and t_num=#{t_num}
+		]]>
+	</select>
+	<select id="GetRetkById" resultType="MyTicket">
+		select tk.tk_num,tk.tk_date,tk.tk_partner,tk.m_id,tk.t_num,s.s_code,tk.r_start,tk.r_end,tk.tk_reserve,tk.tk_bookday,r.r_price 
+		from p_ticket tk inner join p_race r 
+		on tk.r_start = r.r_start and tk.r_end = r.r_end and tk.t_num = r.t_num and tk.r_num = r.r_num 
+		inner join p_sit s on s.s_no = tk.s_no
+		where tk.m_id = #{m_id} and tk.tk_reserve = '미결제'
+		order by tk.tk_date
+	</select>
+	<select id="GetPaytkById" resultType="MyTicket">
+		select tk.tk_num,tk.tk_date,tk.tk_partner,tk.m_id,tk.t_num,s.s_code,tk.r_start,tk.r_end,tk.tk_reserve,tk.tk_bookday,r.r_price
+		from p_ticket tk inner join p_race r 
+		on tk.r_start = r.r_start and tk.r_end = r.r_end and tk.t_num = r.t_num and tk.r_num = r.r_num 
+		inner join p_sit s on s.s_no = tk.s_no
+		where tk.m_id = #{m_id} and tk.tk_reserve = '결제완료'
+		order by tk.tk_date
+	</select>
+	<update id="UpdateReserve">
+		update p_ticket set tk_reserve = '결제완료'
+		where tk_num = #{tk_num}
+	</update>
+	<delete id="DeleteTk">
+		delete p_ticket where tk_num = #{tk_num}
+	</delete>
+</mapper>

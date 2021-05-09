@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias alias="MyMember" type="member.model.MemberBean"/>
+		<typeAlias alias="MyTrain" type="train.model.TrainBean"/>
+		<typeAlias alias="MyRace" type="train.model.RaceBean"/>
+		<typeAlias alias="MyCheck" type="admin.model.CheckBean"/>
+		<typeAlias alias="MyTicket" type="ticket.model.TicketBean"/>
+		<typeAlias alias="MySit" type="ticket.model.SitBean"/>
+		<typeAlias alias="MyVoc" type="voc.model.VocBean"/>
+		<typeAlias alias="MyKBoard" type="kboard.model.KBoardBean"/>
+		<typeAlias alias="MyInBoard" type="inboard.model.InBoardBean"/>
+		<typeAlias alias="MyLost" type="lost.model.LostBean"/>
+	</typeAliases>
+	<mappers>
+		<mapper resource="mybatis/admin.xml"/>
+		<mapper resource="mybatis/member.xml"/>
+		<mapper resource="mybatis/train.xml"/>
+		<mapper resource="mybatis/ticket.xml"/>
+		<mapper resource="mybatis/voc.xml"/>
+		<mapper resource="mybatis/kboard.xml"/>
+		<mapper resource="mybatis/inboard.xml"/>
+		<mapper resource="mybatis/lost.xml"/>
+	</mappers>
+</configuration>
